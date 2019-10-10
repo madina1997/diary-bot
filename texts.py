@@ -20,19 +20,19 @@ FREQUENCY_WEEKLY = {
 
 INTRO = {
     'en': '🚀 Hello, friend! Here is the simple and useful chat bot that helps '
-          'to track mood problems (anxiety & depression). You can receive '
+          'to improve your self-esteem using Cognitive-Behavioral Therapy. You can receive '
           'gentle reminders from time to time or start testing manually. '
-          'Keep calm! 🌼\n\n'
-          '/hars - anxiety test (Hamilton Anxiety Rating Scale)\n'
-          '/madrs - depression test (Montgomery–Åsberg Depression Rating Scale)\n'
+          'First, you need to identify your self-esteem rate 🌼\n\n'
+          '/selfesteem - self-esteem test (Rosenberg Self-Esteem test)\n'
+          '/amiready - test if you are ready\n'
           '/start - settings\n'
           '/export - export results',
     'ru': '🚀 Привет, друг! Это простой и полезный чат бот, который поможет '
           'следить за проблемами настроения (тревога и депрессия). Вы можете'
           'получать регулярные напоминания или запускать тестирование вручную. '
           'Сохраняйте спокойствие! 🌼\n\n'
-          '/hars - тест тревоги (Шкала Тревоги Гамильтона)\n'
-          '/madrs - тест депрессии (Шкала Монтгомери-Асберга)\n'
+          '/selfesteem - тест на самооценку (Тест Розенберга)\n'
+          '/amiready - тест на твою готовность к изменениям\n'
           '/start - настройки\n'
           '/export - экспорт результатов'
 }
@@ -44,13 +44,14 @@ PERIODIC_NOTIFICATION = {
           '/start for notification settings'
 }
 
+AMIREADY_INTRO = {
+    'en': 'After completion of test, we need to clarify if you are ready for the course',
+    'ru': 'После проверки уровня твоей самооценки, надо узнать насколько ты готов к курсу по ее повышению.'
+}
 
 HARS_INTRO = {
-    'en': 'Below is a list of phrases that describe certain feeling that people have. Rate the patients by finding '
-          'the answer which best describes the extent to which he/she has these conditions.',
-    'ru': 'Ниже список фраз, описывающих определенные чувства, которые испытывают люди. Оцените пациента, '
-          'выбрав ответ, который лучше всего '
-          'описывает степень в которой он/она находится.'
+    'en': 'For each statement, indicate to what degree you agree with it.',
+    'ru': 'Опиши в какой степени ты согласен или не согласен с приведенным утверждением.'
 }
 
 

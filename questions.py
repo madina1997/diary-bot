@@ -1,44 +1,88 @@
-HARS_QUESTIONS = {
+AMIREADY_QUESTIONS = {
     "ru": {
-        "answers": ["Отсутствует", "В слабой степени", "В умеренной степени", "В тяжелой степени", "В очень тяжелой степени"],
-        "questions": [
-            "Тревожное настроение. (озабоченность, ожидание наихудшего, тревожные опасения, раздражительность)",
-            "Напряжение. (ощущение напряжения, вздрагивание, легко возникающая плаксивость, дрожь, чувство беспокойства, неспособность расслабиться)",
-            "Страхи. (темноты, незнакомцев, одиночества, животных, толпы, транспорта)",
-            "Инсомния. (затрудненное засыпание, прерывистый сон, не приносящий отдыха, чувство разбитости и слабости при пробуждении, кошмарные сны)",
-            "Интеллектуальные нарушения. (затруднение концентрации внимания, ухудшение памяти)",
-            "Депрессивное настроение. (утрата привычных интересов, чувства удовольствия от хобби, подавленность, ранние пробуждения, суточные колебания настроения)",
-            "Соматические мышечные симптомы. (боли, подергивания, напряжение, судороги клонические, скрипение зубами, срывающийся голос, повышенный мышечный тонус)",
-            "Соматические сенсорные симптомы. (звон в ушах, нечеткость зрения, приливы жара и холода, ощущение слабости, покалывания)",
-            "Сердечно-сосудистые симптомы. (тахикардия, сердцебиение, боль в груди, пульсация в сосудах, частые вздохи)",
-            "Респираторные симптомы. (давление и сжатие в груди, удушье, частые вздохи)",
-            "Гастроинтестинальные симптомы. (затрудненное глотание, метеоризм, боль в животе, изжога, чувство переполненного желудка, тошнота, рвота, урчание в животе, диарея, запоры, снижение веса тела)",
-            "Мочеполовые симптомы. (учащенное мочеиспускание, сильные позывы на мочеиспускание, аменорея, менорагия, фригидность, преждевременная эякуляция, утрата либидо, импотенция)",
-            "Вегетативные симптомы. (сухость во рту, покраснение или бледность кожи, потливость, головные боли с чувством напряжения)",
-            "Поведение при осмотре. (ерзанье на стуле, беспокойная жестикуляция и походка, тремор, нахмуривание лица, напряженное выражение лица, вздохи или учащенное дыхание, частоее сглатывание слюны)"
-        ]
+        "questions": "Что-нибудь еще?",
+        "answers": ["Еще одно", "Всё"],
+        "low": {
+            "plus": "Напиши одно достоинство твоей низкой самооценки",
+            "minus": "Напиши один недостаток твоей низкой самооценки"
+        },
+        "high": {
+            "plus": "Напиши одно достоинство твоей будущей здоровой самооценки",
+            "minus": "Напиши один недостаток твоей будущей здоровой самооценки"
+        }
     },
     "en": {
-        "answers": ["None", "Mild", "Moderate", "Severe", "Very severe"],
+        "questions": "Something else?",
+        "answers": ["One more", "That's all"],
+        "low": {
+            "plus": "Write one advantage of your low self-esteem",
+            "minus": "Write one disadvantage of your low self-esteem"
+        },
+        "high": {
+            "plus": "Write one advantage of the new positive core belief",
+            "minus": "Write one disadvantage of the new positive core belief"
+        }
+    }
+}
+HARS_QUESTIONS = {
+    "ru": {
+        "answers": ["Полностью согласен", "Согласен", "Не согласен", "Полностью не согласен"],
         "questions": [
-            "Anxious. Worries, anticipation of the worst, fearful anticipation, irritability",
-            "Tension. Feelings of tension, fatigability, startle response, moved to tears easily, trembling, feelings of restlessness, inability to relax",
-            "Fears. Of dark, of strangers, of being left alone, of animals, of traffic, of crowds",
-            "Insomnia Difficulty in falling asleep, broken sleep, unsatisfying sleep and fatigue on waking, dreams, nightmares, night-terrors",
-            "Intellectual. Difficulty in concentration, poor memory",
-            "Depressed mood. Loss of interest, lack of pleasure in hobbies, depression, early waking, diurnal swing",
-            "Somatic (muscular). Pains and aches, twitching, stiffness, myoclonic jerks, grinding of teeth, unsteady voice, increased muscular tone",
-            "Somatic (sensory). Tinnitus, blurring of vision, hot and cold flushes, feelings of weakness, pricking sensation",
-            "Cardiovascular symptoms. Tachycardia, palpitations, pain in chest, throbbing of vessels, fainting feelings, missing beat",
-            "Respiratory symptoms. Pressure or constriction in chest, choking feelings, sighing, dyspnea",
-            "Gastrointestinal symptoms. Difficulty in swallowing, wind, abdominal pain, burning sensations, abdominal fullness, nausea, vomiting, borborygmi, looseness of bowels, loss of weight, constipation",
-            "Genitourinary symptoms. Frequency of micturition, urgency of micturition, amenorrhea, menorrhagia, development of frigidity, premature ejaculation, loss of libido, impotence",
-            "Autonomic symptoms. Dry mouth, flushing, pallor, tendency to sweat, giddiness, tension headache, raising of hair",
-            "Behavior at Interview. Fidgeting, restlessness or pacing, tremor of hands, furrowed brow, strained face, sighing or rapid respiration, facial pallor, swallowing, belching, brisk tendon jerks, dilated pupils, exophthalmos"
+            "В целом, я доволен/-на собой",
+            "Порой я думаю, что я никчемный/-ая",
+            "Я считаю, что у меня много хороших качеств",
+            "Я способен/-на выполнять задания так же хорошо, как и окружающие меня люди",
+            "Мне кажется, мне нечем гордиться",
+            "Я часто чувствую себя бесполезным/-ной",
+            "Я достойный человек. Как минимум, наравне с окружающими меня людьми.",
+            "Мне хочется, чтобы меня больше уважали",
+            "Я склонен/-на думать, что я неудачник/-ца",
+            "Я отношусь к себе позитивно"
+        ],
+        "answers_weight": [
+            [3, 2, 1, 0],
+            [0, 1, 2, 3],
+            [3, 2, 1, 0],
+            [3, 2, 1, 0],
+            [0, 1, 2, 3],
+            [0, 1, 2, 3],
+            [3, 2, 1, 0],
+            [0, 1, 2, 3],
+            [0, 1, 2, 3],
+            [3, 2, 1, 0]
+        ]
+        # answers_weight[question_number][answers[i]]
+    },
+    "en": {
+        "answers": ["Strongly agree", "Agree", "Disagree", "Strongly disagree"],
+        "questions": [
+            "On the whole, I am satisfied with myself",
+            "At times I think I am no good at all",
+            "I feel that I have a number of good qualities",
+            "I am able to do things as well as most other people",
+            "I feel I do not have much to be proud of",
+            "I certainly feel useless at times",
+            "I feel that I am a person of worth, at least on an equal plane with others",
+            "I wish I could have more respect for myself",
+            "All in all, I am inclined to feel that I am a failure",
+            "I take a positive attitude towards myself"
+        ],
+        "answers_num": [
+            "3, 2, 1, 0",
+            "0, 1, 2, 3",
+            "3, 2, 1, 0",
+            "3, 2, 1, 0",
+            "0, 1, 2, 3",
+            "0, 1, 2, 3",
+            "3, 2, 1, 0",
+            "0, 1, 2, 3",
+            "0, 1, 2, 3",
+            "3, 2, 1, 0"
         ]
     }
 }
 
+# print(HARS_QUESTIONS["ru"]['answers_weight'][0][0])
 
 MADRS_QUESTIONS = {
     "ru": [

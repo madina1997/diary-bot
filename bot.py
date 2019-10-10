@@ -3,7 +3,7 @@ import logging
 import os
 
 import telegram.bot
-from telegram.ext import Updater, CommandHandler, CallbackQueryHandler
+from telegram.ext import Updater, CommandHandler, CallbackQueryHandler, MessageHandler, Filters
 from telegram.ext import messagequeue as mq
 from telegram.utils.request import Request
 from telegram import InlineKeyboardButton, InlineKeyboardMarkup
@@ -68,8 +68,11 @@ def send_intro(bot, chat_id):
     bot.send_message(text=texts.INTRO[lang], chat_id=chat_id)
 
 
-def send_hars_question(question, bot, chat_id):
-    keyboard = [[InlineKeyboardButton(answer, callback_data=i)] for i, answer in enumerate(question.answers)]
+def send_hars_question(question, answer_weight, bot, chat_id):
+    keyboard = []
+    for j, answer in zip(answer_weight, question.answers): #go through each number in answers_weight for every question
+        keyboard.append([InlineKeyboardButton(answer, callback_data=j)])
+    # keyboard = [[InlineKeyboardButton(answer, callback_data=i)] for i, answer in enumerate(question.answers)]
     reply_markup = InlineKeyboardMarkup(keyboard)
     bot.send_message(text=question.question, reply_markup=reply_markup, chat_id=chat_id)
 
@@ -79,40 +82,81 @@ def hars_quiz(bot, update):
     question = quiz.get_question()
     lang = chat_storage.get_or_create(update.message.chat_id)['language']
     bot.send_message(text=texts.HARS_INTRO[lang], chat_id=update.message.chat_id)
-    send_hars_question(question, bot, update.message.chat_id)
+    answer_weight = quiz.get_answers_weight()
+    send_hars_question(question, answer_weight, bot, update.message.chat_id)
 
+# ВОТ ТУТ БУДЕТ ФУНКЦИЯ НА ОЦЕНКУ ГОТОВНОСТИ
+def send_amiready_question(question, bot, chat_id):
+    # keyboard = [[InlineKeyboardButton(answer, callback_data = i)] for i, answer in enumerate(question.answers)]
+    # reply_markup = InlineKeyboardMarkup(keyboard)
+    # question_text = '{}\n{}'.format(question.question, '\n'.join(question.answers))
+    bot.send_message(text=question, chat_id=chat_id)
 
-def send_madrs_question(question, bot, chat_id):
-    keyboard = [[InlineKeyboardButton(str(i), callback_data=i) for i in range(0, 7)]]
+def send_amiready_keyboard(question, bot, chat_id):
+    keyboard = [[InlineKeyboardButton(answer, callback_data = i)] for i, answer in enumerate(question.answers)]
     reply_markup = InlineKeyboardMarkup(keyboard)
-    question_text = '{}\n{}'.format(question.question, '\n'.join(question.answers))
+    question_text = '{}\n'.format(question.question)
     bot.send_message(text=question_text, reply_markup=reply_markup, chat_id=chat_id)
 
-
-def madrs_quiz(bot, update):
-    quiz = quiz_storage.create_quiz(update.message.chat_id, 'madrs')
-    question = quiz.get_question()
+def amiready_quiz(bot, update):
+    # selfesteem = "low"
+    # sign = "plus"
+    direction = 0
+    quiz = quiz_storage.create_quiz(update.message.chat_id, 'amiready')
+    question = quiz.get_direction()
+    # selfesteem, sign = quiz.process_answer(selfesteem, sign) #here i have changed the selfesteem and sign for a new one
     lang = chat_storage.get_or_create(update.message.chat_id)['language']
-    bot.send_message(text=texts.MADRS_INTRO[lang], chat_id=update.message.chat_id)
-    send_madrs_question(question, bot, update.message.chat_id)
+    bot.send_message(text=texts.AMIREADY_INTRO[lang], chat_id=update.message.chat_id)
+    send_amiready_question(question, bot, update.message.chat_id)
 
 
 def process_answer(bot, update):
+    #ASS added quiz_answer to send individual weights for every question:
     query = update.callback_query
-    bot.edit_message_text(
-        text="{}\n{}".format(query.message.text, query.data), chat_id=query.message.chat_id,
-        message_id=query.message.message_id)
     quiz = quiz_storage.get_latest_quiz(query.message.chat_id)
     quiz_storage.save_answer(quiz, int(query.data))
-    if quiz.is_completed:
-        bot.send_message(chat_id=query.message.chat_id, text="🏁\n{}".format(quiz.get_result()))
-    else:
-        question = quiz.get_question()
-        if quiz.type_ == 'hars':
-            send_hars_question(question, bot, query.message.chat_id)
+    #query.data
+    if quiz.type_ == 'hars':
+        bot.edit_message_text(
+            text="{}\n{}".format(query.message.text, query.data), chat_id=query.message.chat_id,
+            message_id=query.message.message_id)
+        if quiz.is_completed: #ASS have added and hars
+            bot.send_message(chat_id=query.message.chat_id, text="🏁\n{}".format(quiz.get_result()))
         else:
-            send_madrs_question(question, bot, query.message.chat_id)
+            question = quiz.get_question()
+            answer_weight = quiz.get_answers_weight()
+            send_hars_question(question, answer_weight, bot, query.message.chat_id)
+    elif quiz.type_ == 'amiready':
+            #function that sends buttons [Else, That's all]
+            quiz_storage.save_answer(quiz, int(query.data))
+            if int(query.data) == 0:
+                quiz.process_answer()
+                question = quiz.get_direction()
+                send_amiready_question(question, bot, query.message.chat_id)
+                bot.send_message(text = question, chat_id=query.message.chat_id)
+            elif int(query.data) == 1:
+                quiz.process_answer()
+                question = quiz.get_direction()
+                send_amiready_question(question, bot, query.message.chat_id)
+                bot.send_message(text = question, chat_id=query.message.chat_id)
+            # selfesteem, sign = quiz.process_answer(selfesteem, sign)
+            question = quiz.get_direction()
+            # send_amiready_question(question, bot, query.message.chat_id)
 
+    # else:
+    #     question = quiz.get_question()
+    #     if quiz.type_ == 'hars':
+    #         answer_weight = quiz.get_answers_weight()
+    #         send_hars_question(question, answer_weight, bot, query.message.chat_id)
+    #     elif quiz.type_ == 'amiready':
+    #         send_amiready_question(question, bot, query.message.chat_id)
+def process_message(bot, update):
+    bot.send_message(chat_id=update.message.chat_id, text=update.message.text)
+    quiz = quiz_storage.get_latest_quiz(update.message.chat_id)
+    print("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!")
+    print(quiz.type_)
+    question = quiz.get_question()
+    send_amiready_keyboard(question, bot, update.message.chat_id)
 
 def periodic_notifiction_callback(bot, job):
     for chat in chat_storage.get_chats():
@@ -189,10 +233,13 @@ if __name__ == '__main__':
     dispatcher.add_handler(help_handler)
     updater.dispatcher.add_handler(CallbackQueryHandler(process_lang, pattern='(en|ru)'))
     updater.dispatcher.add_handler(CallbackQueryHandler(process_frequency, pattern='(none|daily|weekly)'))
-    start_hars_quiz_handler = CommandHandler('hars', hars_quiz)
+    start_hars_quiz_handler = CommandHandler('selfesteem', hars_quiz)
     dispatcher.add_handler(start_hars_quiz_handler)
-    start_madrs_quiz_handler = CommandHandler('madrs', madrs_quiz)
-    dispatcher.add_handler(start_madrs_quiz_handler)
+    #TRBLMAKERASS
+    start_readiness_eval_handler = CommandHandler('amiready', amiready_quiz)
+    dispatcher.add_handler(start_readiness_eval_handler)
+    handle_messages = MessageHandler(Filters.text, process_message)
+    dispatcher.add_handler(handle_messages)
     updater.dispatcher.add_handler(CallbackQueryHandler(process_answer, pattern='\d+'))  # noqa
     export_handler = CommandHandler('export', export)
     dispatcher.add_handler(export_handler)

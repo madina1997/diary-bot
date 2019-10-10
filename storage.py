@@ -2,8 +2,8 @@ import sqlite3
 import datetime
 
 from db_helpers import dict_factory
-from quizes import HARSQuiz, MADRSQuiz
-from questions import HARS_QUESTIONS, MADRS_QUESTIONS
+from quizes import HARSQuiz, AMIREADY_QUIZ
+from questions import HARS_QUESTIONS, AMIREADY_QUESTIONS
 
 
 class BaseStorage:
@@ -33,7 +33,7 @@ class QuizStorage(BaseStorage):
         chat_data = ChatStorage(self.db_name).get_chat(chat_id)
         cur = self.get_conn().cursor()
         cur.execute(
-            "SELECT * FROM quizes WHERE (chat_id = ?) AND (type = 'madrs') AND (question_number >= 9) "
+            "SELECT * FROM quizes WHERE (chat_id = ?) AND (type = 'amiready') AND (question_number >= 9) "
             "ORDER BY id {} LIMIT ?".format(order),
             (chat_data['id'], limit))
         quizes_data = list(cur.fetchall())
@@ -79,8 +79,8 @@ class QuizStorage(BaseStorage):
             quiz_class = HARSQuiz
             questions = HARS_QUESTIONS
         else:
-            quiz_class = MADRSQuiz
-            questions = MADRS_QUESTIONS
+            quiz_class = AMIREADY_QUIZ
+            questions = AMIREADY_QUESTIONS
         return quiz_class(id, questions, lang, question_number=len(answers), answers=answers, created_at=created_at)
 
     def _get_last_id(self, conn):
