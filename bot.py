@@ -9,9 +9,13 @@ from telegram.utils.request import Request
 from telegram import InlineKeyboardButton, InlineKeyboardMarkup
 from telegram.error import BadRequest
 
-from storage import QuizStorage, ChatStorage
+from storage import QuizStorage, ChatStorage, DatalogStorage
 from export import get_quizes_plot, get_csv
 import texts
+import re
+import time
+from threading import Thread
+from datetime import timedelta
 
 
 logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s', level=logging.DEBUG)
@@ -86,28 +90,23 @@ def hars_quiz(bot, update):
     send_hars_question(question, answer_weight, bot, update.message.chat_id)
 
 # ВОТ ТУТ БУДЕТ ФУНКЦИЯ НА ОЦЕНКУ ГОТОВНОСТИ
-def send_amiready_question(question, bot, chat_id):
-    # keyboard = [[InlineKeyboardButton(answer, callback_data = i)] for i, answer in enumerate(question.answers)]
-    # reply_markup = InlineKeyboardMarkup(keyboard)
-    # question_text = '{}\n{}'.format(question.question, '\n'.join(question.answers))
-    bot.send_message(text=question, chat_id=chat_id)
+# def send_amiready_question(question, bot, chat_id):
+#     bot.send_message(text=question, chat_id=chat_id)
 
-def send_amiready_keyboard(question, bot, chat_id):
-    keyboard = [[InlineKeyboardButton(answer, callback_data = i)] for i, answer in enumerate(question.answers)]
-    reply_markup = InlineKeyboardMarkup(keyboard)
-    question_text = '{}\n'.format(question.question)
-    bot.send_message(text=question_text, reply_markup=reply_markup, chat_id=chat_id)
+
+# def send_amiready_keyboard(question, bot, chat_id):
+#     keyboard = [[InlineKeyboardButton(answer, callback_data = i)] for i, answer in enumerate(question.answers)]
+#     reply_markup = InlineKeyboardMarkup(keyboard)
+#     question_text = '{}\n'.format(question.question)
+#     bot.send_message(text=question_text, reply_markup=reply_markup, chat_id=chat_id)
 
 def amiready_quiz(bot, update):
-    # selfesteem = "low"
-    # sign = "plus"
-    direction = 0
     quiz = quiz_storage.create_quiz(update.message.chat_id, 'amiready')
-    question = quiz.get_direction()
     # selfesteem, sign = quiz.process_answer(selfesteem, sign) #here i have changed the selfesteem and sign for a new one
     lang = chat_storage.get_or_create(update.message.chat_id)['language']
     bot.send_message(text=texts.AMIREADY_INTRO[lang], chat_id=update.message.chat_id)
-    send_amiready_question(question, bot, update.message.chat_id)
+    # question = quiz.get_direction()
+    bot.send_message(text=quiz.questions[lang]["low"]["plus"], chat_id=update.message.chat_id)
 
 
 def process_answer(bot, update):
@@ -115,7 +114,6 @@ def process_answer(bot, update):
     query = update.callback_query
     quiz = quiz_storage.get_latest_quiz(query.message.chat_id)
     quiz_storage.save_answer(quiz, int(query.data))
-    #query.data
     if quiz.type_ == 'hars':
         bot.edit_message_text(
             text="{}\n{}".format(query.message.text, query.data), chat_id=query.message.chat_id,
@@ -127,36 +125,47 @@ def process_answer(bot, update):
             answer_weight = quiz.get_answers_weight()
             send_hars_question(question, answer_weight, bot, query.message.chat_id)
     elif quiz.type_ == 'amiready':
-            #function that sends buttons [Else, That's all]
-            quiz_storage.save_answer(quiz, int(query.data))
-            if int(query.data) == 0:
-                quiz.process_answer()
-                question = quiz.get_direction()
-                send_amiready_question(question, bot, query.message.chat_id)
-                bot.send_message(text = question, chat_id=query.message.chat_id)
-            elif int(query.data) == 1:
-                quiz.process_answer()
-                question = quiz.get_direction()
-                send_amiready_question(question, bot, query.message.chat_id)
-                bot.send_message(text = question, chat_id=query.message.chat_id)
-            # selfesteem, sign = quiz.process_answer(selfesteem, sign)
-            question = quiz.get_direction()
-            # send_amiready_question(question, bot, query.message.chat_id)
+        n = int(query.data)
+        quiz.process_direction(n)
+        question = quiz.get_direction()
+        send_amiready_question(question, bot, query.message.chat_id)
 
-    # else:
-    #     question = quiz.get_question()
-    #     if quiz.type_ == 'hars':
-    #         answer_weight = quiz.get_answers_weight()
-    #         send_hars_question(question, answer_weight, bot, query.message.chat_id)
-    #     elif quiz.type_ == 'amiready':
-    #         send_amiready_question(question, bot, query.message.chat_id)
+
 def process_message(bot, update):
-    bot.send_message(chat_id=update.message.chat_id, text=update.message.text)
+    # bot.send_message(chat_id=update.message.chat_id, text=update.message.text)
     quiz = quiz_storage.get_latest_quiz(update.message.chat_id)
-    print("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!")
-    print(quiz.type_)
-    question = quiz.get_question()
-    send_amiready_keyboard(question, bot, update.message.chat_id)
+    lang = chat_storage.get_or_create(update.message.chat_id)['language']
+    if quiz.type_ == 'amiready':
+        # update.message.reply_text(update.message.text)
+        message = update.message.text.split(",")
+        quiz_storage.save_answer(quiz, len(message))
+        if quiz.question_number == 1:
+            bot.send_message(text = quiz.questions[lang]["low"]["minus"], chat_id=update.message.chat_id)
+        if quiz.question_number == 2:
+            bot.send_message(text = quiz.questions[lang]["high"]["plus"], chat_id=update.message.chat_id)
+        if quiz.question_number == 3:
+            bot.send_message(text = quiz.questions[lang]["high"]["minus"], chat_id=update.message.chat_id)
+        if quiz.question_number == 4:
+            ans = quiz.answers
+            score = ans[1] -ans[0] + ans[2] - ans[3]
+            # update.message.reply_text(quiz.answers)
+            update.message.reply_text("Your score is " + str(score))
+            bot.send_message(chat_id=update.message.chat_id, text="🏁\n{}".format(quiz.get_result(score)))
+    if quiz.type_ == 'positivity':
+        message = update.message.text
+        quiz_storage.save_answer(quiz, len(message))
+        if quiz.question_number == 1:
+            datalog_storage.save_goodevent(update.message.chat_id, good_event=message)
+            bot.send_message(chat_id=update.message.chat_id, text=texts.POSITIVE_LOG[lang][1])
+        if quiz.question_number ==2:
+            datalog_storage.save_emotion(update.message.chat_id, emotion=message)
+            bot.send_message(chat_id=update.message.chat_id, text=texts.POSITIVE_LOG[lang][2])
+        if quiz.question_number == 3:
+            datalog_storage.save_meaning(update.message.chat_id, meaning=message)
+            bot.send_message(chat_id=update.message.chat_id, text="You are done!")
+
+
+
 
 def periodic_notifiction_callback(bot, job):
     for chat in chat_storage.get_chats():
@@ -173,6 +182,34 @@ def periodic_notifiction_callback(bot, job):
         except BadRequest:
             pass
 
+fp = open("cbttips.txt")
+data = fp.read()
+tips_library =re.split("_", data)
+
+
+def send_one_tip(bot, update):
+    restriction = len(tips_library)
+    chat = chat_storage.get_or_create(update.message.chat_id)
+    num = chat['tips_id']
+    if num<restriction:
+        bot.send_message(chat_id=update.message.chat_id, text = tips_library[num])
+        chat['tips_id'] += 1
+        chat_storage.save(chat)
+    else:
+        chat['tips_id'] = 0
+        num = chat['tips_id']
+        chat_storage.save(chat)
+        bot.send_message(chat_id=update.message.chat_id, text = tips_library[num])
+
+
+
+
+def daily_tips(bot, update):
+    for chat in chat_storage.get_chats():
+        try:
+            bot.send_message(chat_id=chat['id'], text=texts.PERIODIC_TIPS[chat['language']])
+        except BadRequest:
+            pass
 
 def export(bot, update):
     keyboard = [[InlineKeyboardButton('PNG', callback_data='png'), InlineKeyboardButton('CSV', callback_data='csv')]]
@@ -194,6 +231,13 @@ def process_export(bot, update):
         quizes = quiz_storage.get_completed_quizes(query.message.chat_id, limit=999)
         csv_buf = get_csv(quizes)
         bot.send_document(chat_id=query.message.chat_id, document=csv_buf, filename='m00d.csv')
+
+def positivity_quiz(bot, update):
+    quiz = quiz_storage.create_quiz(update.message.chat_id, 'positivity')
+    lang = chat_storage.get_or_create(update.message.chat_id)['language']
+    bot.send_message(text=texts.POSITIVELOG_INTRO[lang], chat_id=update.message.chat_id)
+    bot.send_message(text=texts.POSITIVE_LOG[lang][0], chat_id=update.message.chat_id)
+    datalog = datalog_storage.create(update.message.chat_id)
 
 
 class MQBot(telegram.bot.Bot):
@@ -221,6 +265,8 @@ class MQBot(telegram.bot.Bot):
 if __name__ == '__main__':
     quiz_storage = QuizStorage(os.environ.get('DB_NAME'))
     chat_storage = ChatStorage(os.environ.get('DB_NAME'))
+    datalog_storage = DatalogStorage(os.environ.get('DB_NAME'))
+
     q = mq.MessageQueue(all_burst_limit=30, all_time_limit_ms=3000)
     request = Request(con_pool_size=8)
     m00dbot = MQBot(os.environ.get('TG_TOKEN'), request=request, mqueue=q)
@@ -235,9 +281,17 @@ if __name__ == '__main__':
     updater.dispatcher.add_handler(CallbackQueryHandler(process_frequency, pattern='(none|daily|weekly)'))
     start_hars_quiz_handler = CommandHandler('selfesteem', hars_quiz)
     dispatcher.add_handler(start_hars_quiz_handler)
-    #TRBLMAKERASS
+
     start_readiness_eval_handler = CommandHandler('amiready', amiready_quiz)
     dispatcher.add_handler(start_readiness_eval_handler)
+
+    updater.job_queue.run_repeating(daily_tips, timedelta(minutes=1))
+    start_tips = CommandHandler('tips', send_one_tip)
+    dispatcher.add_handler(start_tips)
+
+    track_positivity_handler = CommandHandler('positiveEvent', positivity_quiz)
+    dispatcher.add_handler(track_positivity_handler)
+
     handle_messages = MessageHandler(Filters.text, process_message)
     dispatcher.add_handler(handle_messages)
     updater.dispatcher.add_handler(CallbackQueryHandler(process_answer, pattern='\d+'))  # noqa

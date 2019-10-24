@@ -6,7 +6,7 @@ Question = namedtuple('Question', ['question', 'answers'])
 
 class BaseQuiz:
 
-    def __init__(self, id, questions, lang, question_number=0, answers=None, created_at=None):
+    def __init__(self, id, questions, lang, is_selfesteem_high, is_positive, question_number=0, answers=None, created_at=None):
         self.id = id
         self.questions = questions
         self.lang = lang
@@ -14,16 +14,16 @@ class BaseQuiz:
         self.answers = [] if answers is None else answers
         self.created_at = created_at
         #ASS
-        self.selfesteem = 'low'
-        self.sign = 'plus'
+        self.is_selfesteem_high = is_selfesteem_high
+        self.is_positive = is_positive
 
     def get_question(self):
         raise NotImplementedError
 
     def save_answer(self, answer):
-        # self.answers.append(answer)
-        # self.question_number += 1
-        raise NotImplementedError
+        self.answers.append(answer)
+        self.question_number += 1
+        # raise NotImplementedError
 
     def get_result(self):
         raise NotImplementedError
@@ -43,19 +43,19 @@ class BaseQuiz:
 class AMIREADY_QUIZ(BaseQuiz):
 
     RESULTS = {
-        'ru': ['Ты готов к курсу! Нажми /logging', 'К сожалению, ты не готов к курсу :( Давай ты попробуешь в след.раз!'],
-        'en': ['You are ready! Press /logging', 'Unfortunately, you are not ready for the course']
+        'ru': ['Аееее, ты готов к курсу! Нажми /track_positivity', 'К сожалению, ты не готов к курсу :( Давай ты попробуешь в след.раз!'],
+        'en': ['Yeaaaah, you are ready! Press /track_positivity TO START THE COURSE', 'Unfortunately, you are not ready for the course']
     }
 
     type_ = 'amiready'
-    # def get_directions(self, high_or_low, plus_or_minus):
-    #     return Question(
-    #         "({}) {}".format(
-    #             (self.question_number + 1),
-    #             self.questions[self.lang][high_or_low][plus_or_minus]),
-    #         self.questions[self.lang]['answers'])
-    def save_answer(self, answer):
-        self.answers[0] = answer
+
+
+    # def save_answer(self, answer):
+    #     self.answers.append(answer)
+    #     self.question_number += 1
+
+    def get_answers(self):
+        return self.answers
 
     def get_question(self):
         z =  Question(
@@ -64,26 +64,15 @@ class AMIREADY_QUIZ(BaseQuiz):
             self.questions[self.lang]['answers'])
         return z
 
-    def process_answer(self):
-        if self.answers[0] == 1 and self.selfesteem == 'low' and self.sign == 'plus':
-            self.sign = 'minus'
-        if self.answers[0] == 1 and self.selfesteem == 'low' and self.sign == 'minus':
-            self.selfesteem = 'high'
-            self.sign = 'plus'
-        if self.answers[0] == 1 and self.selfesteem == 'high' and self.sign == 'plus':
-            self.sign = 'minus'
-        if self.answers[0] == 1 and selfesteem == 'high' and sign == 'minus':
-            self.answers[0] == -1
-        if self.answers[0] == -1:
-            print("STOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOP")
+    def get_result(self, score):
+        if score <= 0:
+            description = self.RESULTS[self.lang][1]
+        elif self.result >0:
+            description = self.RESULTS[self.lang][0]
+        return '{}:\n{}\n{}'.format(
+            'Результат' if self.lang == 'ru' else 'Result',
+            score, description)
 
-
-    def get_direction(self):
-        return self.questions[self.lang][self.selfesteem][self.sign]
-
-    def get_next(self):
-        if self.answers == 0:
-            return
 
 
 class HARSQuiz(BaseQuiz):
@@ -93,10 +82,6 @@ class HARSQuiz(BaseQuiz):
         'en': ['Very low self-esteem. Press on /amiready to evaluate if you are ready for changes.', 'Low self-esteem. Press on /amiready to evaluate if you are ready for changes.', 'Healthy self-esteem. You are great!']}
 
     type_ = 'hars'
-
-    def save_answer(self, answer):
-        self.answers.append(answer)
-        self.question_number += 1
 
     def get_question(self):
         return Question(
@@ -125,6 +110,8 @@ class HARSQuiz(BaseQuiz):
     def questions_count(self):
         return len(self.questions[self.lang]['questions'])
 
+class POSITIVE_DATALOG_Quiz(BaseQuiz):
+    type_ = 'positivity'
 
 class MADRSQuiz(BaseQuiz):
 

@@ -2,25 +2,27 @@ AMIREADY_QUESTIONS = {
     "ru": {
         "questions": "Что-нибудь еще?",
         "answers": ["Еще одно", "Всё"],
+        # "answers":["Преимущество низкой самооценки", "Недостаток низкой самооценки", "Преимущество высокой самооценки", "Преимущество низкой самооценки"],
         "low": {
-            "plus": "Напиши одно достоинство твоей низкой самооценки",
-            "minus": "Напиши один недостаток твоей низкой самооценки"
+            "plus": "Напиши все преимущества твоей низкой самооценки через запятую",
+            "minus": "Напиши все недостатки твоей низкой самооценки через запятую"
         },
         "high": {
-            "plus": "Напиши одно достоинство твоей будущей здоровой самооценки",
-            "minus": "Напиши один недостаток твоей будущей здоровой самооценки"
+            "plus": "Напиши все преимущества твоей будущей здоровой самооценки через запятую",
+            "minus": "Напиши все недостатки твоей будущей здоровой самооценки через запятую"
         }
     },
     "en": {
         "questions": "Something else?",
         "answers": ["One more", "That's all"],
+        # "answers":["Преимущество низкой самооценки", "Недостаток низкой самооценки", "Преимущество высокой самооценки", "Преимущество низкой самооценки"],
         "low": {
-            "plus": "Write one advantage of your low self-esteem",
-            "minus": "Write one disadvantage of your low self-esteem"
+            "plus": "Write all advantages of your low self-esteem (with comma)",
+            "minus": "Write all disadvantages of your low self-esteem (with comma)"
         },
         "high": {
-            "plus": "Write one advantage of the new positive core belief",
-            "minus": "Write one disadvantage of the new positive core belief"
+            "plus": "Write all advantages of the new positive core belief (with comma)",
+            "minus": "Write all disadvantages of the new positive core belief (with comma)"
         }
     }
 }
@@ -67,7 +69,7 @@ HARS_QUESTIONS = {
             "All in all, I am inclined to feel that I am a failure",
             "I take a positive attitude towards myself"
         ],
-        "answers_num": [
+        "answers_weight": [
             "3, 2, 1, 0",
             "0, 1, 2, 3",
             "3, 2, 1, 0",
@@ -82,6 +84,9 @@ HARS_QUESTIONS = {
     }
 }
 
+POSITIVE_DATALOG_QUESTIONS = {
+
+}
 # print(HARS_QUESTIONS["ru"]['answers_weight'][0][0])
 
 MADRS_QUESTIONS = {

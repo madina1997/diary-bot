@@ -25,6 +25,8 @@ INTRO = {
           'First, you need to identify your self-esteem rate 🌼\n\n'
           '/selfesteem - self-esteem test (Rosenberg Self-Esteem test)\n'
           '/amiready - test if you are ready\n'
+          '/tips - press this to get advices every day\n'
+          '/positiveEvent - log your positive events\n'
           '/start - settings\n'
           '/export - export results',
     'ru': '🚀 Привет, друг! Это простой и полезный чат бот, который поможет '
@@ -33,6 +35,8 @@ INTRO = {
           'Сохраняйте спокойствие! 🌼\n\n'
           '/selfesteem - тест на самооценку (Тест Розенберга)\n'
           '/amiready - тест на твою готовность к изменениям\n'
+          '/tips - нажмите, чтобы получать советы каждый день\n'
+          '/positiveEvent - зарегистрируй позитивные моменты за сегодня\n'
           '/start - настройки\n'
           '/export - экспорт результатов'
 }
@@ -40,7 +44,14 @@ INTRO = {
 PERIODIC_NOTIFICATION = {
     'ru': 'Пора пройти тест ⏰\n\nНажмите:\n/hars для тестирования тревоги\n/madrs для тестирования депрессии\n'
           '/start - для настройки уведомлений',
-    'en': 'It\'s time to take some tests ⏰\nP\nress :\n/hars for anxiety testing\n/madrs for deperession testing\n'
+    'en': 'It\'s time to take some tests ⏰\nPress :\n/hars for anxiety testing\n/madrs for deperession testing\n'
+          '/start for notification settings'
+}
+
+PERIODIC_TIPS = {
+    'ru': 'Пора получать типс ⏰\n\nНажмите:\n/tips для того, чтобы получить типс\n/positiveEvent для записывания позитивных вещей\n'
+          '/start - для настройки уведомлений',
+    'en': 'It\'s time to get some advices ⏰\nPress :\n/tips to get new tips\n/positiveEvent to log your positive moments\n'
           '/start for notification settings'
 }
 
@@ -49,6 +60,15 @@ AMIREADY_INTRO = {
     'ru': 'После проверки уровня твоей самооценки, надо узнать насколько ты готов к курсу по ее повышению.'
 }
 
+POSITIVE_LOG = {
+    'en': ['What positive event or experience has happened with you today?', 'What did you feel about it?', 'What positive quality did you find out about yourself?'],
+    'ru': ['Что хорошего сегодня с Вами произошло?', 'Что ты чувствовал/-а по этому поводу,', 'Какое положительное качество ты открыл/-а для себя?']
+}
+
+POSITIVELOG_INTRO = {
+    'en': "Hey, now you will need to log your positive events to whatever I dont know",
+    'ru': "Хэй, теперь пора научиться логать свои позитивные моменты жизни "
+}
 HARS_INTRO = {
     'en': 'For each statement, indicate to what degree you agree with it.',
     'ru': 'Опиши в какой степени ты согласен или не согласен с приведенным утверждением.'
